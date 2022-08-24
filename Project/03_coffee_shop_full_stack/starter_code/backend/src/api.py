@@ -12,12 +12,12 @@ setup_db(app)
 CORS(app)
 
 '''
-@TODO uncomment the following line to initialize the datbase
+@TODO uncomment the following line to initialize the database
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this funciton will add one
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -29,7 +29,12 @@ CORS(app)
         or appropriate status code indicating reason for failure
 '''
 
-
+@app.route('/drinks', methods=["GET"])
+@requires_auth
+def get_drinks():
+    body = request.get_json();
+    
+    return true
 '''
 @TODO implement endpoint
     GET /drinks-detail
@@ -38,7 +43,11 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=["GET"])
+@requires_auth
+def get_drinks():
 
+    return true
 
 '''
 @TODO implement endpoint
@@ -49,7 +58,11 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=["POST"])
+@requires_auth
+def get_drinks():
 
+    return true
 
 '''
 @TODO implement endpoint
@@ -62,7 +75,11 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<id>', methods=["PATCH"])
+@requires_auth
+def get_drinks(id):
 
+    return true
 
 '''
 @TODO implement endpoint
@@ -74,7 +91,11 @@ CORS(app)
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<id>', methods=["DELETE"])
+@requires_auth
+def get_drinks(id):
 
+    return true
 
 # Error Handling
 '''
