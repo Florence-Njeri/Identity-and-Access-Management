@@ -30,7 +30,6 @@ db_drop_and_create_all()
 '''
 
 @app.route('/drinks', methods=["GET"])
-@requires_auth
 def get_drinks():
     try:
         drinks = Drink.query.order_by(Drink.id).all();
@@ -55,7 +54,7 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks-detail', methods=["GET"])
-@requires_auth
+@requires_auth('get:drink-details')
 def get_drinks_details():
     try:
         drink_details = Drink.query.all()
@@ -80,8 +79,8 @@ def get_drinks_details():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks', methods=["POST"])
-@requires_auth
-def add_drink():
+@requires_auth('post:drinks')
+def add_drinks():
     try:
         body = request.get_json()
         title = body.get("title", None)
@@ -109,13 +108,15 @@ def add_drink():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<id>', methods=["PATCH"])
-@requires_auth
-def get_drinks(id):
+@requires_auth('patch:drinks')
+def update_drinks(id):
     try:
         drink = Drink.query.filter(Drink.id == id).one_or_none()
         if drink is None:
             abort(404)
-        
+        body = request.get_json()
+        drink.title = body.get("title", None)
+        drink.recipe = body.get("recipe", None)
         drink.update
 
         return jsonify({
@@ -137,8 +138,8 @@ def get_drinks(id):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<id>', methods=["DELETE"])
-@requires_auth
-def get_drinks(id):
+@requires_auth('delete:drinks')
+def delete_drinks(id):
     try:
         drink = Drink.query.filter(Drink.id == id).one_or_none()
         if drink is None:
