@@ -32,9 +32,20 @@ db_drop_and_create_all()
 @app.route('/drinks', methods=["GET"])
 @requires_auth
 def get_drinks():
-    body = request.get_json();
-    
-    return true
+    try:
+        drinks = Drink.query.order_by(Drink.id).all();
+        for drink in drinks:
+            drinks = drink.short()
+        if len(drinks) == 0:
+            abort(404)
+        return jsonify({
+        "success": True,
+        "drinks": drinks,
+        "message": "success"
+    }), 200
+
+    except:
+        abort(422)
 '''
 @TODO implement endpoint
     GET /drinks-detail
@@ -43,11 +54,21 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-@app.route('/drinks', methods=["GET"])
+@app.route('/drinks-detail', methods=["GET"])
 @requires_auth
-def get_drinks():
+def get_drinks_details():
+    try:
+        drink_details = Drink.query.all()
+        for drink in drink_details:
+            drink_details = drink.long()
+        return jsonify({
+            'success': True,
+            'drink details': drink_details,
+            'message': 'success'
+        }), 200
 
-    return true
+    except:
+        abort(422)
 
 '''
 @TODO implement endpoint
@@ -60,9 +81,21 @@ def get_drinks():
 '''
 @app.route('/drinks', methods=["POST"])
 @requires_auth
-def get_drinks():
-
-    return true
+def add_drink():
+    try:
+        body = request.get_json()
+        title = body.get("title", None)
+        recipe = body.get("recipe", None)
+        drink = Drink(title, recipe)
+        drink.insert
+        
+        return jsonify({
+            "success": True,
+            "drinks": drink,
+            "message": "success"
+        }, 200)
+    except: 
+        abort(422)
 
 '''
 @TODO implement endpoint
@@ -78,8 +111,20 @@ def get_drinks():
 @app.route('/drinks/<id>', methods=["PATCH"])
 @requires_auth
 def get_drinks(id):
+    try:
+        drink = Drink.query.filter(Drink.id == id).one_or_none()
+        if drink is None:
+            abort(404)
+        
+        drink.update
 
-    return true
+        return jsonify({
+            "success": True,
+            "drinks": drink,
+            "message": "success"
+        }, 200)
+    except:
+        abort(422)
 
 '''
 @TODO implement endpoint
@@ -94,8 +139,20 @@ def get_drinks(id):
 @app.route('/drinks/<id>', methods=["DELETE"])
 @requires_auth
 def get_drinks(id):
-
-    return true
+    try:
+        drink = Drink.query.filter(Drink.id == id).one_or_none()
+        if drink is None:
+            abort(404)
+        
+        drink.delete
+        return jsonify({
+            "success": True,
+            "delete": id,
+            "drinks": drink,
+            "message": "success"
+        }, 200)
+    except:
+        abort(422)
 
 # Error Handling
 '''
