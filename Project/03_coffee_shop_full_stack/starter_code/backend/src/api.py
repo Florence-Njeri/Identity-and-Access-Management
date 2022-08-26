@@ -1,4 +1,5 @@
 import os
+import sys
 from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
@@ -17,7 +18,7 @@ CORS(app)
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this funciton will add one
 '''
-db_drop_and_create_all()
+# db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -44,6 +45,7 @@ def get_drinks():
     }), 200
 
     except:
+        print("Error is:",sys.exc_info())
         abort(422)
 '''
 @TODO implement endpoint
@@ -54,19 +56,19 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks-detail', methods=["GET"])
-@requires_auth('get:drink-details')
-def get_drinks_details():
+@requires_auth('get:drinks-detail')
+def get_drinks_details(payload):
     try:
         drink_details = Drink.query.all()
         for drink in drink_details:
             drink_details = drink.long()
         return jsonify({
             'success': True,
-            'drink details': drink_details,
-            'message': 'success'
+            'drinks': drink_details
         }), 200
 
     except:
+        print("Error is:",sys.exc_info())
         abort(422)
 
 '''
@@ -80,20 +82,22 @@ def get_drinks_details():
 '''
 @app.route('/drinks', methods=["POST"])
 @requires_auth('post:drinks')
-def add_drinks():
+def add_drinks(payload):
     try:
         body = request.get_json()
+        print("Body:", body)
         title = body.get("title", None)
-        recipe = body.get("recipe", None)
-        drink = Drink(title, recipe)
+        recipe = json.dumps(body.get("recipe", None))
+        drink = Drink(title=title, recipe=recipe)
         drink.insert
-        
+            
         return jsonify({
-            "success": True,
-            "drinks": drink,
-            "message": "success"
+                "success": True,
+                "drinks": drink.title,
+                "message": "success"
         }, 200)
     except: 
+        print("Error is:",sys.exc_info())
         abort(422)
 
 '''
@@ -109,22 +113,24 @@ def add_drinks():
 '''
 @app.route('/drinks/<id>', methods=["PATCH"])
 @requires_auth('patch:drinks')
-def update_drinks(id):
+def update_drinks(payload,id):
     try:
         drink = Drink.query.filter(Drink.id == id).one_or_none()
+        
         if drink is None:
-            abort(404)
+            abort(400)
         body = request.get_json()
         drink.title = body.get("title", None)
-        drink.recipe = body.get("recipe", None)
+        drink.recipe = json.dumps(body.get("recipe", None))
         drink.update
-
+        print("Updated drink!!!", drink.recipe)
         return jsonify({
             "success": True,
-            "drinks": drink,
+            "drinks": drink.title,
             "message": "success"
         }, 200)
     except:
+        print("Error is:",sys.exc_info())
         abort(422)
 
 '''
@@ -139,20 +145,22 @@ def update_drinks(id):
 '''
 @app.route('/drinks/<id>', methods=["DELETE"])
 @requires_auth('delete:drinks')
-def delete_drinks(id):
+def delete_drinks(payload,id):
     try:
         drink = Drink.query.filter(Drink.id == id).one_or_none()
         if drink is None:
             abort(404)
+        print("Drink",drink.title)
         
         drink.delete
         return jsonify({
             "success": True,
             "delete": id,
-            "drinks": drink,
+            "drinks": drink.title,
             "message": "success"
         }, 200)
     except:
+        print("Error is:",sys.exc_info())
         abort(422)
 
 # Error Handling
